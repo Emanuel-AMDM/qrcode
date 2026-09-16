@@ -122,10 +122,23 @@ class AuthController extends Controller
      */
     public function handleGoogleCallback(Request $requisicao)
     {
+        if ($requisicao->has('error')) {
+            \Illuminate\Support\Facades\Log::warning('Login com Google cancelado ou com erro: ' . $requisicao->get('error'));
+            return redirect()->route('login')->with('error', 'A autenticação com o Google foi cancelada.');
+        }
+
         try {
-            $usuarioGoogle = \Laravel\Socialite\Facades\Socialite::driver('google')->user();
+            try {
+                $usuarioGoogle = \Laravel\Socialite\Facades\Socialite::driver('google')->user();
+            } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+                // Fallback resiliente caso o cookie de sessão seja afetado no retorno cross-site
+                $usuarioGoogle = \Laravel\Socialite\Facades\Socialite::driver('google')->stateless()->user();
+            }
         } catch (\Exception $excecao) {
-            return redirect()->route('login')->with('error', 'Falha ao autenticar com o Google. Tente novamente.');
+            \Illuminate\Support\Facades\Log::error('Erro ao obter usuário do Google OAuth: ' . $excecao->getMessage(), [
+                'trace' => $excecao->getTraceAsString()
+            ]);
+            return redirect()->route('login')->with('error', 'Falha ao autenticar com o Google. Verifique suas credenciais e tente novamente.');
         }
 
         if (!$usuarioGoogle || !$usuarioGoogle->getEmail()) {

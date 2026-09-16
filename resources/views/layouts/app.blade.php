@@ -144,8 +144,21 @@
                     @auth
                         <div class="dropdown">
                             <button class="btn btn-outline-secondary btn-sm dropdown-toggle d-flex align-items-center gap-2 rounded-pill px-3 py-2" type="button" data-bs-toggle="dropdown">
-                                <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name='.urlencode(auth()->user()->nome).'&background=0D6EFD&color=fff&bold=true' }}" 
-                                     class="rounded-circle" style="width: 24px; height: 24px; object-fit: cover;" alt="{{ auth()->user()->nome }}">
+                                @if(auth()->user()->avatar)
+                                    <img src="{{ auth()->user()->avatar }}" 
+                                         referrerpolicy="no-referrer"
+                                         class="rounded-circle" 
+                                         style="width: 24px; height: 24px; object-fit: cover;" 
+                                         alt="{{ auth()->user()->nome }}"
+                                         onerror="this.style.display='none'; this.nextElementSibling.classList.remove('d-none');">
+                                    <span class="d-none rounded-circle bg-primary bg-opacity-25 text-primary d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.75rem;">
+                                        <i class="fa-solid fa-user"></i>
+                                    </span>
+                                @else
+                                    <span class="rounded-circle bg-primary bg-opacity-25 text-primary d-inline-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.75rem;">
+                                        <i class="fa-solid fa-user"></i>
+                                    </span>
+                                @endif
                                 <span class="fw-semibold small">{{ auth()->user()->nome }}</span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow-lg border-secondary">
