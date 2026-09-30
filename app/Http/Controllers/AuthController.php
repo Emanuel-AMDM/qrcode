@@ -114,7 +114,7 @@ class AuthController extends Controller
      */
     public function redirectToGoogle()
     {
-        return \Laravel\Socialite\Facades\Socialite::driver('google')->redirect();
+        return \Laravel\Socialite\Facades\Socialite::driver('google')->stateless()->redirect();
     }
 
     /**
@@ -128,12 +128,7 @@ class AuthController extends Controller
         }
 
         try {
-            try {
-                $usuarioGoogle = \Laravel\Socialite\Facades\Socialite::driver('google')->user();
-            } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
-                // Fallback resiliente caso o cookie de sessão seja afetado no retorno cross-site
-                $usuarioGoogle = \Laravel\Socialite\Facades\Socialite::driver('google')->stateless()->user();
-            }
+            $usuarioGoogle = \Laravel\Socialite\Facades\Socialite::driver('google')->stateless()->user();
         } catch (\Exception $excecao) {
             \Illuminate\Support\Facades\Log::error('Erro ao obter usuário do Google OAuth: ' . $excecao->getMessage(), [
                 'trace' => $excecao->getTraceAsString()
